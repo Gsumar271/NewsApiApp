@@ -1,4 +1,7 @@
 <resources>
     <string name="app_name">NewsApiApp</string>
-    <string name="title_item_detail">Item Detail</string>
+    <string name="title_item_detail">Article Detail</string>
+    <string name="articles_feed">
+         https://newsapi.org/v2/top-headlines?sources=bbc-news&amp;apiKey=096dca08f6c34d1bb2e91517aefcd69d
+    </string>
 </resources>
