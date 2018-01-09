@@ -11,12 +11,7 @@ import android.widget.TextView;
 import java.util.List;
 
 /**
- * Created by eugenesumaryev on 1/2/18.
- */
-
-/*
-public class ArticleViewAdapter {
-}
+ * Created on 1/2/18.
 */
 
 public class SimpleItemRecyclerViewAdapter
@@ -29,23 +24,7 @@ public class SimpleItemRecyclerViewAdapter
     private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
         @Override
         public void onClick(View view) {
-              /*  Article item = (Article) view.getTag();
-                if (mTwoPane) {
-                    Bundle arguments = new Bundle();
-                    arguments.putString(ItemDetailFragment.ARG_ITEM_ID, item.getTitle());
-                    ItemDetailFragment fragment = new ItemDetailFragment();
-                    fragment.setArguments(arguments);
-                    mParentActivity.getSupportFragmentManager().beginTransaction()
-                            .replace(R.id.item_detail_container, fragment)
-                            .commit();
-                } else {
-                    Context context = view.getContext();
-                    Intent intent = new Intent(context, ItemDetailActivity.class);
-                    intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, item.getTitle());
-
-                    context.startActivity(intent);
-                }
-                */
+              
         }
 
     };
@@ -60,7 +39,7 @@ public class SimpleItemRecyclerViewAdapter
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-        //super(parent, viewType);
+            
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.headline_view, parent, false);
         return new ViewHolder(view);
@@ -76,10 +55,6 @@ public class SimpleItemRecyclerViewAdapter
                 Bitmap.createScaledBitmap(
                         mValues.get(position).getBitmap(), 50, 50, false));
 
-
-
-        // holder.itemView.setTag(mValues.get(position));
-        //  holder.itemView.setOnClickListener(mOnClickListener);
     }
 
     @Override
