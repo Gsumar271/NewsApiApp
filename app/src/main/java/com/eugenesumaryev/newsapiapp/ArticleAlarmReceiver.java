@@ -6,8 +6,8 @@ import android.content.Intent;
 
 public class ArticleAlarmReceiver extends BroadcastReceiver {
 	
-	public static final String ACTION_REFRESH_ASTEROID_ALARM =
-		      "com.asteroid.ACTION_REFRESH_ASTEROID_ALARM";
+	public static final String ACTION_REFRESH_ARTICLE_ALARM =
+		      "com.eugenesumaryev.newsapiapp.ACTION_REFRESH_ARTICLE_ALARM";
 	
 	@Override
 	public void onReceive(Context context, Intent intent) {

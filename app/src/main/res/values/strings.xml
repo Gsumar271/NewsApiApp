@@ -4,4 +4,11 @@
     <string name="articles_feed">
          https://newsapi.org/v2/top-headlines?sources=bbc-news&amp;apiKey=096dca08f6c34d1bb2e91517aefcd69d
     </string>
+    <string name="search_description">Search Articles</string>
+    <string name="menu_refresh">Refresh</string>
+    <string name="menu_update">Refresh Articles</string>
+    <string name="auto_update_prompt">Auto Update?</string>
+    <string name="update_freq_prompt">Update Frequency</string>
+    <string name="menu_preferences">Preferences</string>
+    <string name="default_widget_text">No Articles</string>
 </resources>

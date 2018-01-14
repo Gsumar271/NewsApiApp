@@ -111,6 +111,13 @@ public class ArticleService {
         }
 
 
+        onDataChangedListener.onDataChanged(allArticles);
+
+    }
+
+}
+
+
 /*
 
         for (int i = 0; i<4; i++){
@@ -121,12 +128,3 @@ public class ArticleService {
 */
 
 
-        onDataChangedListener.onDataChanged(allArticles);
-
-
-    }
-
-
-
-
-}

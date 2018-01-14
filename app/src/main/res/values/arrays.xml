@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string-array name="update_freq_preference">
+        <item>Every Minute</item>
+        <item>5 minutes</item>
+        <item>10 minutes</item>
+        <item>15 minutes</item>
+        <item>Every Hour</item>
+    </string-array>
+
+    <string-array name="entryvalues_update_freq_preference">
+        <item>1</item>
+        <item>5</item>
+        <item>10</item>
+        <item>15</item>
+        <item>60</item>
+    </string-array>
+
+    <string-array name="entries_categories">
+        <item>US</item>
+        <item>WORLD</item>
+        <item>SPORTS</item>
+        <item>TRAVEL</item>
+        <item>BUSINESS</item>
+    </string-array>
+
+    <string-array name="entryvalues_categories">
+        <item>1</item>
+        <item>2</item>
+        <item>3</item>
+        <item>4</item>
+        <item>5</item>
+    </string-array>
+
+
+
+
+</resources>

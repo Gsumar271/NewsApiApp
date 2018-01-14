@@ -2,25 +2,18 @@ package com.eugenesumaryev.newsapiapp;
 
 import android.app.AlarmManager;
 import android.app.IntentService;
-import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
-import android.appwidget.AppWidgetManager;
-import android.content.ComponentName;
-import android.content.ContentResolver;
-import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
 import android.content.SharedPreferences;
-import android.database.Cursor;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
-import android.graphics.Color;
-import android.media.RingtoneManager;
-import android.net.Uri;
 import android.os.IBinder;
 import android.os.SystemClock;
 import android.preference.PreferenceManager;
+import android.support.v4.app.NotificationCompat;
+import android.support.v4.content.LocalBroadcastManager;
 import android.util.Log;
 
 import org.json.JSONArray;
@@ -33,48 +26,62 @@ import java.net.HttpURLConnection;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLConnection;
-import java.util.ArrayList;
-import java.util.Iterator;
 
 
 public class ArticleUpdateService extends IntentService {
 
-	private ArrayList<Article> articles = new ArrayList<Article>();
 
-	public static String TAG = "ARTICLE_UPDATE_SERVICE";
+    //private ArrayList<Article> articles = new ArrayList<Article>();
+    public ArticleList articleList = ArticleList.getInstance();
+    public static String TAG = "ARTICLE_UPDATE_SERVICE";
 
-	//  private Notification.Builder articleNotificationBuilder;
+
+    private NotificationCompat.Builder articleNotificationBuilder;
 	public static final int NOTIFICATION_ID = 1;
+    NotificationManager notificationManager;
 
-
-	public ArticleUpdateService() {
+    public ArticleUpdateService() {
 		super("ArticleUpdateService");
 	}
-
-	public ArticleUpdateService(String name) {
+    public ArticleUpdateService(String name) {
 		super(name);
 	}
 
-
-	public static String ARTICLES_REFRESHED =
-			"com.article.ASTEROIDS_REFRESHED";
-
-	private AlarmManager alarmManager;
+    private AlarmManager alarmManager;
 	private PendingIntent alarmIntent;
 
 
 	@Override
 	public void onCreate() {
+        super.onCreate();
+
+		alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
 
 
-		super.onCreate();
-		  alarmManager = (AlarmManager)getSystemService(Context.ALARM_SERVICE);
+        Intent intentToFire = new Intent(ArticleAlarmReceiver.ACTION_REFRESH_ARTICLE_ALARM);
+        alarmIntent =
+                PendingIntent.getBroadcast(this, 0, intentToFire, 0);
 
-		  String ALARM_ACTION ="com.article.ACTION_REFRESH_ARTICLE_ALARM";
+        // The id of the channel.
+        String id = "channel_01";
 
-		  Intent intentToFire = new Intent(ALARM_ACTION);
-		  alarmIntent =
-			 PendingIntent.getBroadcast(this, 0, intentToFire, 0);
+
+        /*
+        //Build Notification channel
+        NotificationChannel mChannel = new NotificationChannel(
+                id, "article", NotificationManager.IMPORTANCE_DEFAULT);
+
+        notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
+        notificationManager.createNotificationChannel(mChannel);
+        */
+
+        articleNotificationBuilder  = new NotificationCompat.Builder(this, id);
+
+        articleNotificationBuilder
+                .setAutoCancel(true)
+                .setTicker("New Article")
+                .setSmallIcon(R.drawable.notification_icon);
+
 
 	}
 
@@ -89,19 +96,15 @@ public class ArticleUpdateService extends IntentService {
 		SharedPreferences prefs =
 				PreferenceManager.getDefaultSharedPreferences(context);
 
-		/*
+
 		int updateFreq =
-				prefs.getInt(PreferencesActivity.PREF_UPDATE_FREQ_INDEX, 60);
+				prefs.getInt(SettingsActivity.PREF_UPDATE_FREQ, 10);
 
 		boolean autoUpdateChecked =
-				prefs.getBoolean(PreferencesActivity.PREF_AUTO_UPDATE, false);
-		*/
-
-		int updateFreq = 50;
-
-		boolean autoUpdateChecked = true;
+				prefs.getBoolean(SettingsActivity.PREF_AUTO_UPDATE, false);
 
 
+		//Set the Alarm to send out Broadcasts
 		if (autoUpdateChecked) {
 			int alarmType = AlarmManager.ELAPSED_REALTIME_WAKEUP;
 			long timeToRefresh = SystemClock.elapsedRealtime() +
@@ -112,8 +115,6 @@ public class ArticleUpdateService extends IntentService {
 			alarmManager.cancel(alarmIntent);
 
 		refreshArticles();
-
-		sendBroadcast(new Intent(ARTICLES_REFRESHED));
 
 
 	}
@@ -126,7 +127,13 @@ public class ArticleUpdateService extends IntentService {
 
 	private void addNewArticle(Article _article) {
 
-		articles.add(_article);
+
+
+	    //articles.add(_article);
+        articleList.addArticle(_article);
+
+        // Trigger a notification.
+        broadcastNotification(_article);
 
 	}
 
@@ -135,6 +142,7 @@ public class ArticleUpdateService extends IntentService {
 
 		int objCount;
 		Bitmap _bitmap = null;
+
 
 		URL url;
 		try {
@@ -174,7 +182,6 @@ public class ArticleUpdateService extends IntentService {
 						e.printStackTrace();
 					}
 
-
 					final Article article = new Article(_bitmap, _title, _urlLink);
 
 					addNewArticle(article);
@@ -192,60 +199,102 @@ public class ArticleUpdateService extends IntentService {
 		}
 
 
+
 	}
-
-}
-
 	  
-	  
-	 /*
-	private void broadcastNotification(Asteroid _asteroid) {
-		Intent startActivityIntent = new Intent(this, MainActivity.class);
+
+	private void broadcastNotification(Article _article) {
+
+		Intent startActivityIntent = new Intent(this, ArticleMainActivity.class);
 	    PendingIntent launchIntent =
 	    		PendingIntent.getActivity(this, 0, startActivityIntent, 0);
 
-		asteroidNotificationBuilder
+		articleNotificationBuilder
 		    .setContentIntent(launchIntent)
 		    .setWhen(System.currentTimeMillis())
-            .setContentTitle("M:" + _asteroid.getMagnitude())
-    	    .setContentText("D: " + _asteroid.getDiameter());
+            .setContentTitle("Story:")
+    	    .setContentText( _article.getTitle());
 		
-		if (_asteroid.getMagnitude() > 6) {
-		   Uri ringURI =
+
+		/*
+        Uri ringURI =
 		     RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
 
-	      asteroidNotificationBuilder.setSound(ringURI);
-		}
-		
-		double vibrateLength = 100* Math.exp(0.53*_asteroid.getMagnitude());
-	    long[] vibrate = new long[] {100, 100, (long)vibrateLength };
-	    asteroidNotificationBuilder.setVibrate(vibrate);
-	    
-	    int color;
-	    if (_asteroid.getMagnitude() < 5.4)
-	      color = Color.GREEN;
-	    else if (_asteroid.getMagnitude() < 6)
-	      color = Color.YELLOW;
-	    else
-	      color = Color.RED;
+        articleNotificationBuilder.setSound(ringURI);
 
-	    asteroidNotificationBuilder.setLights(
+
+		double vibrateLength = 100;
+	    long[] vibrate = new long[] {100, 100, (long)vibrateLength };
+	    articleNotificationBuilder.setVibrate(vibrate);
+	    
+	    int color = Color.BLACK;
+
+
+	    articleNotificationBuilder.setLights(
 	      color, 
 	      (int)vibrateLength, 
 	      (int)vibrateLength);
-		
+
+        notificationManager.notify(NOTIFICATION_ID,
+                articleNotificationBuilder.build());
+
+       */
+
+        Intent localIntent =
+                new Intent(ArticleMainActivity.BROADCAST_ARTICLE_REFRESHED);
+
+        // Broadcasts the Intent to receivers in this app.
+        LocalBroadcastManager.getInstance(this).sendBroadcast(localIntent);
+
+
+
 		NotificationManager notificationManager
 	      = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
 
-	    notificationManager.notify(NOTIFICATION_ID,
-	      asteroidNotificationBuilder.getNotification());
+
+		notificationManager.notify(NOTIFICATION_ID,
+	      articleNotificationBuilder.getNotification());
+
 	    
 	    
 	  
 	  }
-	  */
+}
+
 
 
 /*
 Your API key is: 096dca08f6c34d1bb2e91517aefcd69d
- */
+*/
+
+/*
+		//for each article in array
+		for (objCount = 0; objCount < 10; objCount++) {
+
+			String _title = "article" + String.valueOf(objCount);
+			String _urlLink = "url";
+
+			final Article article = new Article(_bitmap, _title, _urlLink);
+
+			Thread t = new Thread(new Runnable() {
+				@Override
+				public void run() {
+					try {
+						Thread.sleep(5000);
+					} catch (InterruptedException e) {
+						e.printStackTrace();
+					}
+					addNewArticle(article);
+				}
+			});
+			t.start();
+
+
+			String _title = "article" + String.valueOf(System.currentTimeMillis());
+			String _urlLink = "url";
+
+			final Article article = new Article(_bitmap, _title, _urlLink);
+
+			addNewArticle(article);
+*/
+

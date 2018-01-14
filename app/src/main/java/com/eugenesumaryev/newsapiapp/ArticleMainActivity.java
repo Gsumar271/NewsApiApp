@@ -1,51 +1,36 @@
 package com.eugenesumaryev.newsapiapp;
 
+import android.content.BroadcastReceiver;
 import android.content.Context;
 import android.content.Intent;
-import android.content.res.Resources;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
+import android.content.IntentFilter;
 import android.os.Bundle;
 import android.os.Handler;
 import android.support.annotation.NonNull;
+import android.support.v4.content.LocalBroadcastManager;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.RecyclerView;
 import android.support.v7.widget.Toolbar;
-import android.support.design.widget.FloatingActionButton;
-import android.support.design.widget.Snackbar;
 import android.util.Log;
-import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ImageView;
-import android.widget.TextView;
 
 
-import com.eugenesumaryev.newsapiapp.dummy.DummyContent;
-
-import org.json.JSONArray;
-import org.json.JSONException;
-import org.json.JSONObject;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 /**
  * An activity representing a list of Items. This activity
  * has different presentations for handset and tablet-size devices. On
  * handsets, the activity presents a list of items, which when touched,
- * lead to a {@link ItemDetailActivity} representing
+ * lead to a {@link ArticleDetailActivity} representing
  * item details. On tablets, the activity presents the list of items and
  * item details side-by-side using two vertical panes.
  */
-public class ItemListActivity extends AppCompatActivity implements ArticleService.OnDataChangedListener {
+public class ArticleMainActivity extends AppCompatActivity
+        /*implements ArticleService.OnDataChangedListener*/
+{
 
     /**
      * Whether or not the activity is in two-pane mode, i.e. running on a tablet
@@ -55,11 +40,16 @@ public class ItemListActivity extends AppCompatActivity implements ArticleServic
 
     private ArrayList<Article> allArticles;
     private SimpleItemRecyclerViewAdapter sa;
-    private ArticleService service;
+   // private ArticleService service;
     private View rView;
+   // private Handler handler = new Handler();
+
+    // Defines a custom Intent action
+    public static final String BROADCAST_ARTICLE_REFRESHED =
+            "com.eugenesumaryev.newsapiapp.ACTION_ARTICLE_REFRESHED";
 
 
-    public static String TAG = "Refresh";
+    // public static String TAG = "Refresh";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -70,6 +60,8 @@ public class ItemListActivity extends AppCompatActivity implements ArticleServic
         setSupportActionBar(toolbar);
         toolbar.setTitle(getTitle());
 
+
+        /*
         FloatingActionButton fab = (FloatingActionButton) findViewById(R.id.fab);
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -77,15 +69,21 @@ public class ItemListActivity extends AppCompatActivity implements ArticleServic
 
                 Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+
+                sa.notifyDataSetChanged();
+
+                Log.v("Onclicked:", String.valueOf(sa.getItemCount()));
+
                 // Article someArticle = new Article("someImg", "someTitle", "someArticle");
 
-                /*
-                allArticles.add(someArticle);
-                sa.notifyDataSetChanged();
-                */
+
+               // allArticles.add(someArticle);
+               // sa.notifyDataSetChanged();
+
 
             }
         });
+       */
 
         if (findViewById(R.id.item_detail_container) != null) {
             // The detail container view will be present only in the
@@ -102,12 +100,45 @@ public class ItemListActivity extends AppCompatActivity implements ArticleServic
 
 
         allArticles = new ArrayList<Article>();
+        allArticles = ArticleList.getInstance().getAllArticles();
 
+        // The filter's action is BROADCAST_ARTICLE_REFRESHED
+        IntentFilter statusIntentFilter = new IntentFilter(
+                BROADCAST_ARTICLE_REFRESHED);
+
+        // Instantiates a new ArticleStateReceiver
+        ArticleStateReceiver mArticleStateReceiver =
+                new ArticleStateReceiver();
+        // Registers the ArticleStateReceiver and its intent filters
+        LocalBroadcastManager.getInstance(this).registerReceiver(
+                mArticleStateReceiver,
+                statusIntentFilter);
+
+        /*
+
+        handler.post(
+                new Runnable() {
+                    public void run() {
+                        populateArticles();
+                    }
+                });
+        */
+
+     //   populateArticles();
+
+        setupRecyclerView((RecyclerView) recyclerView);
+
+        startService(new Intent(this,
+                ArticleUpdateService.class));
+
+
+        /*
         //create a service class, passing the resources
         service = new ArticleService(this);
 
         //  setupRecyclerView((RecyclerView) recyclerView);
 
+        /*
         Thread t = new Thread(new Runnable() {
             public void run() {
 
@@ -119,23 +150,14 @@ public class ItemListActivity extends AppCompatActivity implements ArticleServic
             }
         });
         t.start();
-
-        /*
-        final Handler handler = new Handler();
-
-        handler.post(
-                new Runnable() {
-                    public void run(){
-                        populateArticles();
-                    }
-                });
-
         */
 
-        // Log.v("AllArtrticles", String.valueOf(allArticles.size()));
+
+        // final Handler handler = new Handler();
+
+
+        // Log.v("AllArticles", String.valueOf(allArticles.size()));
         //  setupRecyclerView((RecyclerView) recyclerView);
-
-
     }
 
     private void setupRecyclerView(@NonNull RecyclerView recyclerView) {
@@ -150,6 +172,104 @@ public class ItemListActivity extends AppCompatActivity implements ArticleServic
     }
 
 
+    public void populateArticles() {
+
+        allArticles = ArticleList.getInstance().getAllArticles();
+        setupRecyclerView((RecyclerView) rView);
+
+    }
+
+
+
+
+
+    //Private BroadcastReceiver class to receive notifications when new Article is downloaded
+    private class ArticleStateReceiver extends BroadcastReceiver {
+
+
+        //prevents instantiation
+        private ArticleStateReceiver(){
+        }
+
+        @Override
+        public void onReceive(Context context, Intent intent) {
+
+         //   allArticles.clear();
+
+
+         //   allArticles = ArticleList.getInstance().getAllArticles();
+
+         //   setupRecyclerView((RecyclerView) rView);
+
+
+           sa.notifyDataSetChanged();
+
+         //  Log.v("OnReceive:", String.valueOf(sa.getItemCount()));
+
+           // Log.v("OnReceiveArticles", String.valueOf(allArticles.size()));
+          // sa.notifyItemChanged(0);
+
+        }
+
+    }
+
+    private static final int SHOW_PREFERENCES = 1;
+
+
+    @Override
+    public boolean onCreateOptionsMenu(Menu menu) {
+        super.onCreateOptionsMenu(menu);
+
+        MenuInflater inflater = getMenuInflater();
+        inflater.inflate(R.menu.main_menu, menu);
+
+        return true;
+    }
+
+    public boolean onOptionsItemSelected(MenuItem item){
+        super.onOptionsItemSelected(item);
+
+        switch (item.getItemId()) {
+
+            case (R.id.menu_refresh): {
+                startService(new Intent(this, ArticleUpdateService.class));
+                return true;
+            }
+            case (R.id.menu_preferences): {
+
+                Class c =
+                        SettingsActivity.class;
+                Intent i = new Intent(this, c);
+                startActivityForResult(i, SHOW_PREFERENCES);
+
+                /*
+                // Display the fragment as the main content.
+                getFragmentManager().beginTransaction()
+                        .replace(android.R.id.content, new PreferencesFragment())
+                        .commit();
+                */
+
+                return true;
+
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        super.onActivityResult(requestCode, resultCode, data);
+
+       // if (requestCode == SHOW_PREFERENCES)
+
+
+        startService(new Intent(this, ArticleUpdateService.class));
+    }
+
+
+
+
+    /*
     //notify main thread that data has been changed abd view needs to be updated
     @Override
     public void onDataChanged(ArrayList<Article> articleList) {
@@ -161,75 +281,12 @@ public class ItemListActivity extends AppCompatActivity implements ArticleServic
 
                     @Override
                     public void run() {
-
                         setupRecyclerView((RecyclerView) rView);
                     }
                 });
     }
 
-
-    public void populateArticles() {
-
-        int objCount;
-        Bitmap _bitmap = null;
-
-        URL url;
-        try {
-            String articlesFeed = getString(R.string.articles_feed);
-            url = new URL(articlesFeed);
-
-            URLConnection connection;
-            connection = url.openConnection();
-
-            HttpURLConnection httpConnection = (HttpURLConnection) connection;
-            int responseCode = httpConnection.getResponseCode();
-
-            if (responseCode == HttpURLConnection.HTTP_OK) {
-                InputStream in = httpConnection.getInputStream();
-
-                // Parse the articles feed.
-                JSNParser parser = new JSNParser();
-                JSONObject obj = (JSONObject) parser.readJSONObject(in);
-
-
-                JSONArray articleArray = (JSONArray) obj.get("articles");
-
-                //for each article in array
-                for (objCount = 0; objCount < articleArray.length(); objCount++) {
-
-                    JSONObject articleObject = (JSONObject) articleArray.get(objCount);
-
-                    String _urlImage = articleObject.getString("urlToImage");
-                    String _title = articleObject.getString("title");
-                    String _urlLink = articleObject.getString("url");
-
-                    try {
-                        InputStream inStream = new URL(_urlImage).openStream();
-                        _bitmap = BitmapFactory.decodeStream(inStream);
-                    } catch (Exception e) {
-                        Log.e("Error", e.getMessage());
-                        e.printStackTrace();
-                    }
-
-
-                    final Article article = new Article(_bitmap, _title, _urlLink);
-
-                    allArticles.add(article);
-                }
-
-            }
-
-        } catch (MalformedURLException e) {
-            Log.d(TAG, "MalformedURLException", e);
-        } catch (IOException e) {
-            Log.d(TAG, "IOException", e);
-        } catch (JSONException e) {
-            Log.e(TAG, "JSON Exception", e);
-        } finally {
-        }
-
-
-    }
+    */
 
 }
 
@@ -317,6 +374,71 @@ public class ItemListActivity extends AppCompatActivity implements ArticleServic
                     }
                 });
     }
+
+    public void populateArticles() {
+
+        int objCount;
+        Bitmap _bitmap = null;
+
+        URL url;
+        try {
+            String articlesFeed = getString(R.string.articles_feed);
+            url = new URL(articlesFeed);
+
+            URLConnection connection;
+            connection = url.openConnection();
+
+            HttpURLConnection httpConnection = (HttpURLConnection) connection;
+            int responseCode = httpConnection.getResponseCode();
+
+            if (responseCode == HttpURLConnection.HTTP_OK) {
+                InputStream in = httpConnection.getInputStream();
+
+                // Parse the articles feed.
+                JSNParser parser = new JSNParser();
+                JSONObject obj = (JSONObject) parser.readJSONObject(in);
+
+
+                JSONArray articleArray = (JSONArray) obj.get("articles");
+
+                //for each article in array
+                for (objCount = 0; objCount < articleArray.length(); objCount++) {
+
+                    JSONObject articleObject = (JSONObject) articleArray.get(objCount);
+
+                    String _urlImage = articleObject.getString("urlToImage");
+                    String _title = articleObject.getString("title");
+                    String _urlLink = articleObject.getString("url");
+
+                    try {
+                        InputStream inStream = new URL(_urlImage).openStream();
+                        _bitmap = BitmapFactory.decodeStream(inStream);
+                    } catch (Exception e) {
+                        Log.e("Error", e.getMessage());
+                        e.printStackTrace();
+                    }
+
+
+                    final Article article = new Article(_bitmap, _title, _urlLink);
+
+                    allArticles.add(article);
+                }
+
+            }
+
+        } catch (MalformedURLException e) {
+            Log.d(TAG, "MalformedURLException", e);
+        } catch (IOException e) {
+            Log.d(TAG, "IOException", e);
+        } catch (JSONException e) {
+            Log.e(TAG, "JSON Exception", e);
+        } finally {
+        }
+
+
+    }
+
+
   */
 
 
@@ -325,7 +447,7 @@ public class ItemListActivity extends AppCompatActivity implements ArticleServic
     public static class SimpleItemRecyclerViewAdapter
             extends RecyclerView.Adapter<SimpleItemRecyclerViewAdapter.ViewHolder> {
 
-        private final ItemListActivity mParentActivity;
+        private final ArticleMainActivity mParentActivity;
         private final List<Article> mValues;
         private final boolean mTwoPane;
 
@@ -335,16 +457,16 @@ public class ItemListActivity extends AppCompatActivity implements ArticleServic
                 Article item = (Article) view.getTag();
                 if (mTwoPane) {
                     Bundle arguments = new Bundle();
-                    arguments.putString(ItemDetailFragment.ARG_ITEM_ID, item.getTitle());
-                    ItemDetailFragment fragment = new ItemDetailFragment();
+                    arguments.putString(ArticleDetailFragment.ARG_ITEM_ID, item.getTitle());
+                    ArticleDetailFragment fragment = new ArticleDetailFragment();
                     fragment.setArguments(arguments);
                     mParentActivity.getSupportFragmentManager().beginTransaction()
                             .replace(R.id.item_detail_container, fragment)
                             .commit();
                 } else {
                     Context context = view.getContext();
-                    Intent intent = new Intent(context, ItemDetailActivity.class);
-                    intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, item.getTitle());
+                    Intent intent = new Intent(context, ArticleDetailActivity.class);
+                    intent.putExtra(ArticleDetailFragment.ARG_ITEM_ID, item.getTitle());
 
                     context.startActivity(intent);
                 }
@@ -353,7 +475,7 @@ public class ItemListActivity extends AppCompatActivity implements ArticleServic
 
         };
 
-        SimpleItemRecyclerViewAdapter(ItemListActivity parent,
+        SimpleItemRecyclerViewAdapter(ArticleMainActivity parent,
                                       List<Article> items,
                                       boolean twoPane) {
             mValues = items;
@@ -402,7 +524,7 @@ public class ItemListActivity extends AppCompatActivity implements ArticleServic
 
 
 /*
-public class ItemListActivity extends AppCompatActivity {
+public class ArticleMainActivity extends AppCompatActivity {
 
 
     //  Whether or not the activity is in two-pane mode, i.e. running on a tablet
@@ -460,9 +582,9 @@ private boolean mTwoPane;
 
 
 public static class SimpleItemRecyclerViewAdapter
-        extends RecyclerView.Adapter<ItemListActivity.SimpleItemRecyclerViewAdapter.ViewHolder> {
+        extends RecyclerView.Adapter<ArticleMainActivity.SimpleItemRecyclerViewAdapter.ViewHolder> {
 
-    private final ItemListActivity mParentActivity;
+    private final ArticleMainActivity mParentActivity;
     private final List<DummyContent.DummyItem> mValues;
     private final boolean mTwoPane;
     private final View.OnClickListener mOnClickListener = new View.OnClickListener() {
@@ -471,23 +593,23 @@ public static class SimpleItemRecyclerViewAdapter
             DummyContent.DummyItem item = (DummyContent.DummyItem) view.getTag();
             if (mTwoPane) {
                 Bundle arguments = new Bundle();
-                arguments.putString(ItemDetailFragment.ARG_ITEM_ID, item.id);
-                ItemDetailFragment fragment = new ItemDetailFragment();
+                arguments.putString(ArticleDetailFragment.ARG_ITEM_ID, item.id);
+                ArticleDetailFragment fragment = new ArticleDetailFragment();
                 fragment.setArguments(arguments);
                 mParentActivity.getSupportFragmentManager().beginTransaction()
                         .replace(R.id.item_detail_container, fragment)
                         .commit();
             } else {
                 Context context = view.getContext();
-                Intent intent = new Intent(context, ItemDetailActivity.class);
-                intent.putExtra(ItemDetailFragment.ARG_ITEM_ID, item.id);
+                Intent intent = new Intent(context, ArticleDetailActivity.class);
+                intent.putExtra(ArticleDetailFragment.ARG_ITEM_ID, item.id);
 
                 context.startActivity(intent);
             }
         }
     };
 
-    SimpleItemRecyclerViewAdapter(ItemListActivity parent,
+    SimpleItemRecyclerViewAdapter(ArticleMainActivity parent,
                                   List<DummyContent.DummyItem> items,
                                   boolean twoPane) {
         mValues = items;
@@ -496,14 +618,14 @@ public static class SimpleItemRecyclerViewAdapter
     }
 
     @Override
-    public ItemListActivity.SimpleItemRecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
+    public ArticleMainActivity.SimpleItemRecyclerViewAdapter.ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.item_list_content, parent, false);
-        return new ItemListActivity.SimpleItemRecyclerViewAdapter.ViewHolder(view);
+        return new ArticleMainActivity.SimpleItemRecyclerViewAdapter.ViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(final ItemListActivity.SimpleItemRecyclerViewAdapter.ViewHolder holder, int position) {
+    public void onBindViewHolder(final ArticleMainActivity.SimpleItemRecyclerViewAdapter.ViewHolder holder, int position) {
         holder.mIdView.setText(mValues.get(position).id);
         holder.mContentView.setText(mValues.get(position).content);
 

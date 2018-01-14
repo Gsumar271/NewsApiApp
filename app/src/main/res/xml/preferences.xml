@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+  <PreferenceCategory
+      android:title="autoUpdate">
+
+    <CheckBoxPreference
+        android:key="checkbox_preference"
+        android:title="@string/auto_update_prompt"
+        android:defaultValue="true"
+        android:summary="check if you want articles to automatically refresh" />
+
+  </PreferenceCategory>
+
+  <PreferenceCategory
+      android:title="customized">
+
+    <ListPreference
+        android:key="category_preference"
+        android:title="News Category"
+        android:summary="Update article category"
+        android:entries="@array/entries_categories"
+        android:entryValues="@array/entryvalues_categories"
+        android:dialogTitle="Please enter news category" />
+
+    <ListPreference
+        android:key="update_list_preference"
+        android:title="@string/update_freq_prompt"
+        android:summary="Manually update refresh frequency"
+        android:entries="@array/update_freq_preference"
+        android:entryValues="@array/entryvalues_update_freq_preference"
+        android:dialogTitle="Please choose update frequency" />
+
+  </PreferenceCategory>
+
+</PreferenceScreen>
+
+<!--
+
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen xmlns:android="http://schemas.android.com/apk/res/android">
+  <PreferenceCategory
+      android:title="inline_preferences">
+
+    <CheckBoxPreference
+        android:key="checkbox_preference"
+        android:title="title_checkbox_preference"
+        android:summary="summary_checkbox_preference" />
+
+  </PreferenceCategory>
+
+  <PreferenceCategory
+      android:title="dialog_based_preferences">
+
+    <EditTextPreference
+        android:key="edittext_preference"
+        android:title="title_edittext_preference"
+        android:summary="summary_edittext_preference"
+        android:dialogTitle="dialog_title_edittext_preference" />
+
+    <ListPreference
+        android:key="list_preference"
+        android:title="title_list_preference"
+        android:summary="summary_list_preference"
+        android:entries="@array/entries_list_preference"
+        android:entryValues="@array/entryvalues_list_preference"
+        android:dialogTitle="dialog_title_list_preference" />
+
+  </PreferenceCategory>
+
+
+  <PreferenceCategory
+      android:title="preference_attributes">
+
+    <CheckBoxPreference
+        android:key="parent_checkbox_preference"
+        android:title="title_parent_preference"
+        android:summary="summary_parent_preference" />
+        -->
+
+    <!-- The visual style of a child is defined by this styled theme attribute. -->
+<!--
+<CheckBoxPreference
+android:key="child_checkbox_preference"
+android:dependency="parent_checkbox_preference"
+android:layout="?android:attr/preferenceLayoutChild"
+android:title="title_child_preference"
+android:summary="summary_child_preference" />
+
+    </PreferenceCategory>
+
+    </PreferenceScreen>
+
+
+<?xml version="1.0" encoding="utf-8"?>
+<PreferenceScreen
+  xmlns:android="http://schemas.android.com/apk/res/android">
+  <CheckBoxPreference
+    android:key="PREF_AUTO_UPDATE"
+    android:title="Auto refresh"
+    android:summary="Select to turn on automatic updating"
+    android:defaultValue="true"
+  />
+  <ListPreference
+   android:key="PREF_UPDATE_FREQ"
+   android:title="Refresh frequency"
+   android:summary="Frequency at which to refresh asteroids list"
+   android:entries="@array/update_freq_options"
+   android:entryValues="@array/update_freq_values"
+   android:dialogTitle="Refresh frequency"
+   android:defaultValue="60"
+  />
+  <ListPreference
+    android:key="PREF_MIN_MAG"
+    android:title="Minimum magnitude"
+    android:summary="Select the minimum magnitude asteroids to report"
+    android:entries="@array/magnitude_options"
+    android:entryValues="@array/magnitude"
+    android:dialogTitle="Magnitude"
+    android:defaultValue="3"
+  />
+</PreferenceScreen>
+-->
