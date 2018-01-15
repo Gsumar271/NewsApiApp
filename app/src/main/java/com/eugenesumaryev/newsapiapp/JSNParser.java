@@ -1,4 +1,4 @@
-package com.eugenesumaryev.newsapiapp;
+package com.newsapiapp;
 
 import android.util.JsonReader;
 import android.util.JsonToken;
