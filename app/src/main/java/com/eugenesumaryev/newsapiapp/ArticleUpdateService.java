@@ -1,4 +1,4 @@
-package com.eugenesumaryev.newsapiapp;
+package com.newsapiapp;
 
 import android.app.AlarmManager;
 import android.app.IntentService;
@@ -30,8 +30,6 @@ import java.net.URLConnection;
 
 public class ArticleUpdateService extends IntentService {
 
-
-    //private ArrayList<Article> articles = new ArrayList<Article>();
     public ArticleList articleList = ArticleList.getInstance();
     public static String TAG = "ARTICLE_UPDATE_SERVICE";
 
@@ -65,16 +63,6 @@ public class ArticleUpdateService extends IntentService {
         // The id of the channel.
         String id = "channel_01";
 
-
-        /*
-        //Build Notification channel
-        NotificationChannel mChannel = new NotificationChannel(
-                id, "article", NotificationManager.IMPORTANCE_DEFAULT);
-
-        notificationManager = (NotificationManager)getSystemService(Context.NOTIFICATION_SERVICE);
-        notificationManager.createNotificationChannel(mChannel);
-        */
-
         articleNotificationBuilder  = new NotificationCompat.Builder(this, id);
 
         articleNotificationBuilder
@@ -90,7 +78,6 @@ public class ArticleUpdateService extends IntentService {
 	protected void onHandleIntent(Intent intent) {
 
 
-		//newest added from book
 		Context context = getApplicationContext();
 
 		SharedPreferences prefs =
@@ -127,11 +114,7 @@ public class ArticleUpdateService extends IntentService {
 
 	private void addNewArticle(Article _article) {
 
-
-
-	    //articles.add(_article);
         articleList.addArticle(_article);
-
         // Trigger a notification.
         broadcastNotification(_article);
 
@@ -216,30 +199,6 @@ public class ArticleUpdateService extends IntentService {
     	    .setContentText( _article.getTitle());
 		
 
-		/*
-        Uri ringURI =
-		     RingtoneManager.getDefaultUri(RingtoneManager.TYPE_NOTIFICATION);
-
-        articleNotificationBuilder.setSound(ringURI);
-
-
-		double vibrateLength = 100;
-	    long[] vibrate = new long[] {100, 100, (long)vibrateLength };
-	    articleNotificationBuilder.setVibrate(vibrate);
-	    
-	    int color = Color.BLACK;
-
-
-	    articleNotificationBuilder.setLights(
-	      color, 
-	      (int)vibrateLength, 
-	      (int)vibrateLength);
-
-        notificationManager.notify(NOTIFICATION_ID,
-                articleNotificationBuilder.build());
-
-       */
-
         Intent localIntent =
                 new Intent(ArticleMainActivity.BROADCAST_ARTICLE_REFRESHED);
 
@@ -254,47 +213,7 @@ public class ArticleUpdateService extends IntentService {
 
 		notificationManager.notify(NOTIFICATION_ID,
 	      articleNotificationBuilder.getNotification());
-
-	    
-	    
-	  
+ 
 	  }
 }
-
-
-
-/*
-Your API key is: 096dca08f6c34d1bb2e91517aefcd69d
-*/
-
-/*
-		//for each article in array
-		for (objCount = 0; objCount < 10; objCount++) {
-
-			String _title = "article" + String.valueOf(objCount);
-			String _urlLink = "url";
-
-			final Article article = new Article(_bitmap, _title, _urlLink);
-
-			Thread t = new Thread(new Runnable() {
-				@Override
-				public void run() {
-					try {
-						Thread.sleep(5000);
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-					addNewArticle(article);
-				}
-			});
-			t.start();
-
-
-			String _title = "article" + String.valueOf(System.currentTimeMillis());
-			String _urlLink = "url";
-
-			final Article article = new Article(_bitmap, _title, _urlLink);
-
-			addNewArticle(article);
-*/
 
