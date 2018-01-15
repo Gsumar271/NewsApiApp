@@ -1,12 +1,14 @@
-package com.eugenesumaryev.newsapiapp;
+package com.newsapiapp;
 
 import java.util.ArrayList;
 
 /**
- * Created by eugenesumaryev on 1/9/18.
+ * Created on 1/9/18.
  */
 
 //Utilize a singleton pattern
+//This class is used to store Article 
+//Array throughout the application
 
 public class ArticleList {
 
