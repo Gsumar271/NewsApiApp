@@ -10,8 +10,6 @@ import android.view.ViewGroup;
 import android.webkit.WebView;
 import android.webkit.WebViewClient;
 
-import com.eugenesumaryev.newsapiapp.dummy.DummyContent;
-
 /**
  * Created on 12/7/17.
  */
