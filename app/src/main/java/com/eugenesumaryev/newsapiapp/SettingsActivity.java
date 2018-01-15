@@ -1,4 +1,4 @@
-package com.eugenesumaryev.newsapiapp;
+package com.newsapiapp;
 
 import android.app.Activity;
 import android.content.SharedPreferences;
@@ -9,7 +9,7 @@ import android.preference.PreferenceActivity;
 import android.preference.PreferenceManager;
 
 /**
- * Created by eugenesumaryev on 1/11/18.
+ * Created on 1/11/18.
  */
 
 public class SettingsActivity extends Activity
@@ -50,11 +50,6 @@ public class SettingsActivity extends Activity
         } else if (key.equals(PREF_CATEGORY)) {
 
 
-            //  ListPreference preference = (ListPreference) findPreference(key);
-
-            //  int cat = preference.getValue();
-
-
             category = sharedPreferences.getInt(key, -1);
             switch (category) {
                 case 1:
@@ -75,13 +70,6 @@ public class SettingsActivity extends Activity
                 default:
                     cat = "WORLD";
                     break;
-
-                // Set summary to be the user-description for the selected value
-                // connectionPref.setSummary(sharedPreferences.getString(key, ""));
-
-
-                //  prefs = PreferenceManager.getDefaultSharedPreferences(getApplicationContext());
-
 
             }
         } else if (key.equals(PREF_UPDATE_FREQ)) {
