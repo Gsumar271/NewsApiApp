@@ -1,14 +1,13 @@
-package com.eugenesumaryev.newsapiapp;
+package com.newsapiapp;
 
 import android.graphics.Bitmap;
 
 /**
- * Created by eugenesumaryev on 1/2/18.
+ * Created on 1/2/18.
  */
 
 public class Article {
 
-    private String urlImage;
     private String title;
     private String urlArticle;
     private Bitmap bitmap;
@@ -16,19 +15,14 @@ public class Article {
 
 
     public Article (Bitmap _bitmap, String _title, String _urlArticle){
-       // urlImage = _urlImage;
+    
         bitmap = _bitmap;
-
         title = _title;
         urlArticle = _urlArticle;
     }
 
 
     public Bitmap getBitmap() { return bitmap; }
-
-    public String getUrlImage() {
-        return urlImage;
-    }
 
     public String getTitle() {
         return title;
@@ -41,8 +35,7 @@ public class Article {
     @Override
     public String toString() {
         return "Article{" +
-                "urlImage='" + urlImage + '\'' +
-                ", title='" + title + '\'' +
+                "title='" + title + '\'' +
                 ", urlArticle='" + urlArticle + '\'' +
                 '}';
     }
