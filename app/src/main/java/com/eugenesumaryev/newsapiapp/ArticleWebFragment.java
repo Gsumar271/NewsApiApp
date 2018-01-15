@@ -13,7 +13,7 @@ import android.webkit.WebViewClient;
 import com.eugenesumaryev.newsapiapp.dummy.DummyContent;
 
 /**
- * Created by eugenesumaryev on 12/7/17.
+ * Created on 12/7/17.
  */
 
 public class ArticleWebFragment extends Fragment {
@@ -56,7 +56,6 @@ public class ArticleWebFragment extends Fragment {
         if (articleUrl != null) {
 
             mWebView = (WebView) view.findViewById(R.id.activity_webview);
-            //mWebView.loadUrl("https://en.wikipedia.org/wiki/Asteroid");
             mWebView.loadUrl(articleUrl);
             // Force links and redirects to open in the WebView instead of in a browser
             mWebView.setWebViewClient(new WebViewClient());
