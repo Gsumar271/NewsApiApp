@@ -1,4 +1,4 @@
-package com.eugenesumaryev.newsapiapp;
+package com.newsapiapp;
 
 import android.app.Activity;
 import android.content.Context;
@@ -20,7 +20,7 @@ import java.net.URLConnection;
 import java.util.ArrayList;
 
 /**
- * Created by eugenesumaryev on 1/5/18.
+ * Created on 1/5/18.
  *
  */
 
@@ -40,9 +40,7 @@ public class ArticleService {
     Activity activity;
 
     public ArticleService(Activity _activity) {
-
-        //allArticles = _list;
-       //res = _res;
+        
         activity = _activity;
 
         onDataChangedListener = (OnDataChangedListener)activity;
@@ -117,14 +115,5 @@ public class ArticleService {
 
 }
 
-
-/*
-
-        for (int i = 0; i<4; i++){
-            Article someArticle = new Article(_bitmap, "someTitle"+i, "someArticle");
-            allArticles.add(someArticle);
-        }
-
-*/
 
 
