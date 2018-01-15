@@ -1,4 +1,4 @@
-package com.eugenesumaryev.newsapiapp;
+package com.newsapiapp;
 
 import android.content.Context;
 import android.content.Intent;
@@ -14,7 +14,7 @@ import android.widget.TextView;
 import java.util.List;
 
 /**
- * Created by eugenesumaryev on 1/2/18.
+ * Created on 1/2/18.
  */
 
 public class SimpleItemRecyclerViewAdapter
@@ -33,7 +33,7 @@ public class SimpleItemRecyclerViewAdapter
                     Bundle arguments = new Bundle();
                     arguments.putString(ArticleWebFragment.ARG_ITEM_URL, item.getUrlArticle());
                     arguments.putString(ArticleWebFragment.ARG_ITEM_TITLE, item.getTitle());
-                    //ArticleDetailFragment fragment = new ArticleDetailFragment();
+           
                     ArticleWebFragment fragment = new ArticleWebFragment();
                     fragment.setArguments(arguments);
                     mParentActivity.getSupportFragmentManager().beginTransaction()
@@ -47,15 +47,6 @@ public class SimpleItemRecyclerViewAdapter
 
                     context.startActivity(intent);
                 }
-
-
-           /*
-            Context context = view.getContext();
-            Intent intent = new Intent(context, ArticleDetailActivity.class);
-            intent.putExtra(ArticleDetailFragment.ARG_ITEM_ID, item.getTitle());
-
-            context.startActivity(intent);
-            */
         }
 
     };
@@ -64,18 +55,15 @@ public class SimpleItemRecyclerViewAdapter
                                   List<Article> items,
                                   boolean twoPane) {
         mValues = items;
-       // mValues = ArticleList.getInstance().getAllArticles();
         mParentActivity = parent;
         mTwoPane = twoPane;
-      //  Log.v("SIRVA constructor:", "called");
+
     }
 
     @Override
     public ViewHolder onCreateViewHolder(ViewGroup parent, int viewType) {
-       // super(parent, viewType);
         View view = LayoutInflater.from(parent.getContext())
                 .inflate(R.layout.headline_view, parent, false);
-      //  Log.v("OnCreateViewHolder:", "called");
         return new ViewHolder(view);
     }
 
@@ -94,17 +82,11 @@ public class SimpleItemRecyclerViewAdapter
 
          holder.itemView.setTag(mValues.get(position));
          holder.itemView.setOnClickListener(mOnClickListener);
-      //  Log.v("OnBindViewHolder", "called");
 
     }
 
     @Override
     public int getItemCount() {
-        /*
-        Log.v("getItemCount:", "called");
-        Log.v("itemcount:",  String.valueOf(mValues.size()));
-        */
-
         return mValues.size();
     }
 
@@ -116,7 +98,6 @@ public class SimpleItemRecyclerViewAdapter
             super(view);
             mImgView = (ImageView) view.findViewById(R.id.headline_image);
             mContentView = (TextView) view.findViewById(R.id.article_headline);
-           // Log.v("ViewHolder constructor:", "called");
         }
     }
 }
