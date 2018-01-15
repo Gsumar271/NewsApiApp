@@ -1,4 +1,4 @@
-package com.eugenesumaryev.newsapiapp;
+package com.newsapiapp;
 
 import android.app.Activity;
 import android.support.design.widget.CollapsingToolbarLayout;
