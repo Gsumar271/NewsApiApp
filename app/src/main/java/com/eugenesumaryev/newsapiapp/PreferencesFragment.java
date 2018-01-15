@@ -1,4 +1,4 @@
-package com.eugenesumaryev.newsapiapp;
+package com.newsapiapp;
 
 import android.content.SharedPreferences;
 import android.os.Bundle;
